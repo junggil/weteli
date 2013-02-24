@@ -28,7 +28,10 @@ app.get '/', (req, res) =>
 
     parser = new xml2js.Parser()
     parser.on 'end', (result) =>
-      res.render 'list', {title: 'Youtube', items: result.feed.entry}
+      items = ({'title': entry.title[0]._, \
+                'src': entry.content[0].$.src, \
+                'thumbnail': entry['media:group'][0]['media:thumbnail'][0].$.url} for entry in result.feed.entry)
+      res.json(items)
     parser.parseString body
 
 app.listen 3000, () =>
