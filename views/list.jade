@@ -1,20 +1,40 @@
-div(data-role='page')
-  header(data-role='header')
-    h1= title
-  div(data-role='content')
-    //just basic check, we will always have items from youtube though
-      - if(items.length)
-          //create a listview wrapper
-          ul(data-role='listview')
-              //foreach of the collected elements
-              - items.forEach(function(item){
-                  //create a li
-                  li
-                      //and a link using our passed urlObj Object
-                      a(href=item.content[0].$.src, title=item.title[0]._)
-                          //and a thumbnail
-                          img(src=item['media:group'][0]['media:thumbnail'][0].$.url, alt='Thumbnail')
-                          //title and time label
-                          h3= item.title[0]._
-                          h5= item['media:group'][0]['yt:duration'][0].$.seconds
-              - })
+!!! 5
+html(lang='en')
+head
+    meta(charset='utf-8')
+    title Sticky footer · Twitter Bootstrap
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    link(rel='stylesheet', href='/css/bootstrap.css')
+    link(rel='stylesheet', href='/css/bootstrap-responsive.css')
+    link(rel='stylesheet', href='/css/my.ss')
+  body
+    #wrap
+      .container
+        .page-header
+          h1 Connected TV with Vu:Talk
+        .row-fluid
+          #youtube-player.span8
+          ul.thumbnails
+            li.span4
+              .thumbnail
+                img(src='http://i.ytimg.com/vi/dMH0bHeiRNg/1.jpg')
+                h5 
+                   | Evolution of Dance - By Judson Laipply
+                p 
+                   | Evolution of Dance - By Judson Laipply
+      #push
+    #footer
+      .container
+        p.muted.credit
+          | Example courtesy 
+          a(href='http://martinbean.co.uk') Martin Bean
+          |  and 
+          a(href='http://ryanfait.com/sticky-footer/') Ryan Fait
+          | .
+    script(src='/js/jquery-1.9.1.min.js')
+    script(src='/js/bootstrap.js')
+    script(src='/js/jQuery.tubeplayer.min.js')
+    script(src='/js/my.js')
+
