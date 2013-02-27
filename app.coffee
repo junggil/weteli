@@ -74,7 +74,7 @@ app.get '/playlist/get', (req, res) =>
 app.get '/playlist/add/:id', (req, res) =>
   if req.params.id not in (entry.id for entry in playlist)
     request {uri: 'http://gdata.youtube.com/feeds/api/videos/' + req.params.id}, (err, response, body) =>
-        parser.on 'end', (result) =>
+        parser = new xml2js.Parser()
         parser.parseString body, (err, result) =>
           item = get_details result.entry
           item['like']    = 0
