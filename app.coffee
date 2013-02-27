@@ -29,8 +29,8 @@ global.tv_code = 2848
 get_random_code = () -> Math.floor(Math.random() * 10000)
 get_index = (id, list) -> (entry.id for entry in list).indexOf id
 get_duration = (x) -> Math.floor(x/60) + ':' + ('0'+ x%60).substr(-2)
-htmlEscape = (html) -> (html).replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '\\\'').replace(/"/g, '\\\"').replace(/[\r\n]/g, '<br />')
-get_details = (entry) -> title: entry.title[0]._, \
+htmlEscape = (html) -> if html? then (html).replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/[\r\n]/g, '<br />') else ''
+get_details = (entry) -> title: htmlEscape(entry.title[0]._), \
                             id: entry.id[0].split('/').pop(), \
                            src: entry.content[0].$.src, \
                       duration: get_duration(entry['media:group'][0]['yt:duration'][0].$.seconds), \
@@ -70,22 +70,17 @@ app.get '/user/list', (req, res) =>
 
 app.get '/playlist/get', (req, res) =>
     res.json playlist
-    #io.sockets.emit 'playlist add', {id:'_OBlgSz8sSM', title:'br test'}
 
 app.get '/playlist/add/:id', (req, res) =>
   if req.params.id not in (entry.id for entry in playlist)
     request {uri: 'http://gdata.youtube.com/feeds/api/videos/' + req.params.id}, (err, response, body) =>
-      try
-        parser = new xml2js.Parser()
         parser.on 'end', (result) =>
+        parser.parseString body, (err, result) =>
           item = get_details result.entry
           item['like']    = 0
           item['dislike'] = 0
           playlist.push item
           res.json item
-        parser.parseString body
-      catch error
-        console.log 'Request error.'
   else
       res.json playlist
 
@@ -110,14 +105,14 @@ app.get '/playlist/dislike/:id', (req, res) =>
 
 app.get '/feed/:name', (req, res) =>
   request {uri: 'https://gdata.youtube.com/feeds/api/standardfeeds/KR/' + req.params.name}, (err, response, body) =>
-    try
       parser = new xml2js.Parser()
-      parser.on 'end', (result, err) =>
-        res.json (get_details entry for entry in result.feed.entry)
-      parser.parseString body
-    catch error
-      console.log 'Request error.'
-      res.json []
+      parser.parseString body, (err, result) =>
+        feeds = []
+        for entry in result.feed.entry
+            try
+                feeds.push get_details(entry)
+            catch error
+        res.json feeds
 
 app.listen 3000, () =>
   console.log "Express server listening on port %d in %s mode", app.address().port, app.settings.env
