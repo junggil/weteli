@@ -1,40 +1,81 @@
 !!! 5
-html(lang='en')
-head
+html
+  head
     meta(charset='utf-8')
-    title Sticky footer · Twitter Bootstrap
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    meta(name='description', content='')
-    meta(name='author', content='')
-    link(rel='stylesheet', href='/css/bootstrap.css')
-    link(rel='stylesheet', href='/css/bootstrap-responsive.css')
-    link(rel='stylesheet', href='/css/my.ss')
-  body
-    #wrap
-      .container
-        .page-header
-          h1 Connected TV with Vu:Talk
-        .row-fluid
-          #youtube-player.span8
-          ul.thumbnails
-            li.span4
-              .thumbnail
-                img(src='http://i.ytimg.com/vi/dMH0bHeiRNg/1.jpg')
-                h5 
-                   | Evolution of Dance - By Judson Laipply
-                p 
-                   | Evolution of Dance - By Judson Laipply
-      #push
-    #footer
-      .container
-        p.muted.credit
-          | Example courtesy 
-          a(href='http://martinbean.co.uk') Martin Bean
-          |  and 
-          a(href='http://ryanfait.com/sticky-footer/') Ryan Fait
-          | .
-    script(src='/js/jquery-1.9.1.min.js')
-    script(src='/js/bootstrap.js')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='apple-mobile-web-app-capable', content='yes')
+    meta(name='apple-mobile-web-app-status-bar-style', content='black')
+    title weteli_tv
+    link(rel='stylesheet', href='/css/jquery.mobile-1.2.0.min.css')
+    link(rel='stylesheet', href='/css/my.css')
+    link(rel='stylesheet', href='/css/tooltips.css')
+    script(src='/js/jquery.min.js')
+    script(src='/js/jquery.mobile-1.2.0.min.js')
+    script(src='/js/tooltips.js')
     script(src='/js/jQuery.tubeplayer.min.js')
+    script(src='/socket.io/socket.io.js')
     script(src='/js/my.js')
+    script
+        var timer;
+        show_chat = function(id, title) {
+            clearTimeout(timer);
+            timer = setTimeout(function(){$('#chat a').mouseout();}, 3000);
 
+            $('#chat a').attr('title', id + ' says \"' + title + '\"')
+            $('#chat a').tooltips();
+            $('#chat a').mouseover();
+        }
+
+        next_movie = function() {
+            if ($('#playlist li').length > 2){ $('#playlist li').eq(1).remove(); }
+            if ($('#playlist li').length > 2){ $('#playlist a').eq(0).click(); }
+        }
+        
+        play_movie = function(id) {
+            $('#youtube-player-container').tubeplayer('play', id);
+        }
+
+        swap_position = function(from, to) {
+            src = $('#playlist li').eq(from);
+            src.hide()
+            $('#playlist li').eq(from).remove();
+            $('#playlist li').eq(to).before(src);
+            src.slideDown();
+        }
+
+        add_movie = function(id, title) {
+            var html, newdiv;
+            html = $('#playlist li:last').html();
+            newdiv = $('<li data-theme="c" data-corners="false" data-shadow="false" data-iconshadow="true" data-iconsize="18" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" class="ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-btn-up-c">');
+            newdiv.html(html);
+            newdiv.hide();
+            $('#playlist li:last').before(newdiv);
+            $('#playlist a').eq(-2).text(title);
+            $('#playlist a').eq(-2).click(function() { play_movie(id); });
+            if ($('#playlist li').length == 3){
+                play_movie(id);
+            }
+            newdiv.slideDown();
+        }
+  body
+    #page1(data-role='page')
+      div(data-theme='a', data-role='header')
+        h3
+          | Video Jukebox
+      div(data-role='content')
+        .split-wrapper
+          .content-secondary
+            #youtube-player-container  
+          .content-primary#playlist
+            ul(data-role='listview', data-divider-theme='a', data-inset='true')
+              li(data-role='list-divider', role='heading')
+                | Playlist
+              li(data-theme='c')
+                a(href='#', data-transition='slide')
+                  | Add your video now!
+        #chat
+            a(title='James: what the fuck')
+      div(data-theme='a', data-role='footer', data-position='fixed')
+        h2
+          p(style="text-decoration:underline;color:orange;") CODE: #{code}
+          p Powered by Realtime Relay Server (a.k.a Vu:Talk )
