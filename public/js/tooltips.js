@@ -20,7 +20,7 @@
       var linkPosition = $el.position();
 
       $tooltip.css({
-        top: '703px',
+        top: '453px',
         left: '480px'
       });
 

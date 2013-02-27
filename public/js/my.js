@@ -292,10 +292,10 @@ $(function(){
         add_movie(data.id, data.title);
     });
     socket.on('playlist position', function(data) {
-        swap_position(data.id, data.title);
+        swap_position(data.from, data.to);
     });
     socket.on('chat message', function(data){
-        show_chat(data.id, data.msg);
+        show_chat(data.nickname, data.msg);
     });
 });
     

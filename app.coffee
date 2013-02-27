@@ -27,8 +27,7 @@ global.devices = {}
 global.tv_code = 2848
 
 get_random_code = () -> Math.floor(Math.random() * 10000)
-get_ids = () -> (entry.id for entry in playlist)
-get_index = (id) -> get_ids().indexOf id
+get_index = (id, list) -> (entry.id for entry in list).indexOf id
 get_duration = (x) -> Math.floor(x/60) + ':' + ('0'+ x%60).substr(-2)
 htmlEscape = (html) -> (html).replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '\\\'').replace(/"/g, '\\\"').replace(/[\r\n]/g, '<br />')
 get_details = (entry) -> title: entry.title[0]._, \
@@ -74,7 +73,7 @@ app.get '/playlist/get', (req, res) =>
     #io.sockets.emit 'playlist add', {id:'_OBlgSz8sSM', title:'br test'}
 
 app.get '/playlist/add/:id', (req, res) =>
-  if req.params.id not in get_ids
+  if req.params.id not in (entry.id for entry in playlist)
     request {uri: 'http://gdata.youtube.com/feeds/api/videos/' + req.params.id}, (err, response, body) =>
       try
         parser = new xml2js.Parser()
@@ -91,20 +90,20 @@ app.get '/playlist/add/:id', (req, res) =>
       res.json playlist
 
 app.get '/playlist/like/:id', (req, res) =>
-    before = get_index req.params.id
+    before = get_index req.params.id, playlist
     playlist[before].like += 1
     playlist.sort((item1, item2) -> (item2.like - item2.dislike) - (item1.like - item1.dislike))
-    after = get_index req.params.id
-    console.log before, after, before != after
+    after = get_index req.params.id, playlist
+    console.log before, after
     if before != after
         io.sockets.emit 'playlist position', {from:before+1, to:after+1}
     res.json []
 
 app.get '/playlist/dislike/:id', (req, res) =>
-    before = get_index req.params.id
+    before = get_index req.params.id, playlist
     playlist[before].dislike += 1
     playlist.sort((item1, item2) -> (item2.like - item2.dislike) - (item1.like - item1.dislike))
-    after = get_index req.params.id
+    after = get_index req.params.id, playlist
     if before != after
         io.sockets.emit 'playlist position', {from:before+1, to:after+1}
     res.json []

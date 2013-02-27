@@ -22,6 +22,7 @@ html
             timer = setTimeout(function(){$('#chat a').mouseout();}, 3000);
 
             $('#chat a').attr('title', id + ' says \"' + title + '\"')
+            $('.tooltip').remove();
             $('#chat a').tooltips();
             $('#chat a').mouseover();
         }
@@ -52,10 +53,10 @@ html
             $('#playlist li:last').before(newdiv);
             $('#playlist a').eq(-2).text(title);
             $('#playlist a').eq(-2).click(function() { play_movie(id); });
+            newdiv.slideDown();
             if ($('#playlist li').length == 3){
                 play_movie(id);
             }
-            newdiv.slideDown();
         }
   body
     #page1(data-role='page')
