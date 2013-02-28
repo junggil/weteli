@@ -45,10 +45,10 @@ var attachEvents = function() {
 			var theme,
 				$btn = $( closestEnabledButton( event.target ) ),
 				evt = event.type;
-		
+
 			if ( $btn.length ) {
 				theme = $btn.attr( "data-" + $.mobile.ns + "theme" );
-		
+
 				if ( evt === "vmousedown" ) {
 					if ( $.support.touch ) {
 						hov = setTimeout(function() {
@@ -145,7 +145,7 @@ $.fn.buttonMarkup = function( options ) {
 		if ( attachEvents && !buttonElements) {
 			attachEvents();
 		}
-		
+
 		// if not, try to find closest theme container	
 		if ( !o.theme ) {
 			o.theme = $.mobile.getInheritedTheme( el, "c" );	
@@ -160,13 +160,13 @@ $.fn.buttonMarkup = function( options ) {
 			// Used to control styling in headers/footers, where buttons default to `mini` style.
 			buttonClass += o.mini ? " ui-mini" : " ui-fullsize";
 		}
-		
+
 		if ( o.inline !== undefined ) {			
 			// Used to control styling in headers/footers, where buttons default to `mini` style.
 			buttonClass += o.inline === false ? " ui-btn-block" : " ui-btn-inline";
 		}
-		
-		
+
+
 		if ( o.icon ) {
 			o.icon = "ui-icon-" + o.icon;
 			o.iconpos = o.iconpos || "left";
@@ -284,12 +284,12 @@ $(function(){
         onSeek: function(time){}, // after the video has been seeked to a defined point
         onMute: function(){}, // after the player is muted
         onUnMute: function(){}, // after the player is unmuted
-        onPlayerEnded: next_movie
+        onPlayerEnded: function(){}
     });
 
-    var socket = io.connect('http://192.168.0.2');
+    var socket = io.connect('http://movl.lgr2s.com');
     socket.on('playlist add', function(data) {
-        add_movie(data.id, data.title);
+        add_movie(data.id, data.title, data.duration);
     });
     socket.on('playlist position', function(data) {
         swap_position(data.from, data.to);

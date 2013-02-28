@@ -28,12 +28,11 @@ global.tv_code = 2848
 
 get_random_code = () -> Math.floor(Math.random() * 10000)
 get_index = (id, list) -> (entry.id for entry in list).indexOf id
-get_duration = (x) -> Math.floor(x/60) + ':' + ('0'+ x%60).substr(-2)
 htmlEscape = (html) -> if html? then (html).replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g,'').replace(/"/g,'').replace(/[\r\n]/g, '<br />') else ''
 get_details = (entry) -> title: htmlEscape(entry.title[0]._), \
                             id: entry.id[0].split('/').pop(), \
                            src: entry.content[0].$.src, \
-                      duration: get_duration(entry['media:group'][0]['yt:duration'][0].$.seconds), \
+                      duration: entry['media:group'][0]['yt:duration'][0].$.seconds, \
                    description: htmlEscape(entry['media:group'][0]['media:description'][0]._), \
                      thumbnail: entry['media:group'][0]['media:thumbnail'][1].$.url
 
