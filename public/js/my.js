@@ -297,6 +297,20 @@ $(function(){
     socket.on('chat message', function(data){
         show_chat(data.nickname, data.msg);
     });
+    socket.on('user add', function(data) {
+        $.gritter.add({ 
+            title: 'IN:' + data.nickname,
+            text: 'New friends are coming here!',
+            time: 2000
+        });
+    });
+    socket.on('user quit', function(data) {
+        $.gritter.add({ 
+            title: 'OUT:' + data.nickname,
+            text: 'Your friend has ust quitted!',
+            time: 2000
+        });
+    });
 });
     
 })(jQuery);

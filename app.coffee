@@ -49,12 +49,14 @@ io.sockets.on 'connection', (socket) =>
         else
             devices[data.nickname] = socket
             socket.emit 'connect ack', {success:true}
+            socket.emit 'user add', {nickname, nickname}
     socket.on 'mobile chat', (data) =>
         socket.broadcast.emit 'chat message', data
     socket.on 'disconnect', () =>
         for key of devices
             if devices[key] == socket
                 delete devices[key]
+                socket.emit 'user quit', {nickname, key}
                 break
 
 #Routes
@@ -89,7 +91,6 @@ app.get '/playlist/like/:id', (req, res) =>
     playlist[before].like += 1
     playlist.sort((item1, item2) -> (item2.like - item2.dislike) - (item1.like - item1.dislike))
     after = get_index req.params.id, playlist
-    console.log before, after
     if before != after
         io.sockets.emit 'playlist position', {from:before+1, to:after+1}
     res.json []
