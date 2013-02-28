@@ -11,7 +11,7 @@
   <script src="site_media/js/jquery.min.js"></script>
   <script src="site_media/js/jquery.mobile-1.2.0.min.js"></script>
   <script src="site_media/js/my.js"></script>
-  <script src="http://movl.lgr2s.com:3000/socket.io/socket.io.js"></script>
+  <script src="http://movl.lgr2s.com/socket.io/socket.io.js"></script>
 
   <!-- User-generated css -->
   <style>
@@ -20,8 +20,7 @@
 
   <!-- User-generated js -->
   <script>
-      var server = 'http://movl.lgr2s.com:3000';
-      //var server = 'http://192.168.0.2:3000';
+      var server = 'http://movl.lgr2s.com';
       var socket = io.connect(server);
 
       socket.on('connect ack', function(data){
