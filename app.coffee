@@ -58,7 +58,7 @@ io.sockets.on 'connection', (socket) =>
                 break
 
 #Routes
-app.get '/view/tv', (req, res) =>
+app.get '/', (req, res) =>
     global.tv_code = get_random_code()
     res.render('list', {
         title: 'Connected TV',
