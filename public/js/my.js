@@ -299,16 +299,18 @@ $(function(){
     });
     socket.on('user add', function(data) {
         $.gritter.add({ 
-            title: 'IN:' + data.nickname,
+            title: data.nickname,
             text: 'New friends are coming here!',
-            time: 2000
+            image: '/images/in.png',
+            time: 3000
         });
     });
     socket.on('user quit', function(data) {
         $.gritter.add({ 
-            title: 'OUT:' + data.nickname,
+            title: data.nickname,
             text: 'Your friend has ust quitted!',
-            time: 2000
+            image: '/images/out.png',
+            time: 3000
         });
     });
 });

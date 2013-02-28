@@ -1,5 +1,4 @@
 express = require 'express'
-routes = require './routes'
 request = require 'request'
 xml2js = require 'xml2js'
 socketio = require 'socket.io'
@@ -48,14 +47,14 @@ io.sockets.on 'connection', (socket) =>
         else
             devices[data.nickname] = socket
             socket.emit 'connect ack', {success:true}
-            socket.emit 'user add', {nickname, nickname}
+            socket.broadcast.emit 'user add', {nickname: data.nickname}
     socket.on 'mobile chat', (data) =>
         socket.broadcast.emit 'chat message', data
     socket.on 'disconnect', () =>
         for key of devices
             if devices[key] == socket
                 delete devices[key]
-                socket.emit 'user quit', {nickname, key}
+                socket.broadcast.emit 'user quit', {nickname: key}
                 break
 
 #Routes

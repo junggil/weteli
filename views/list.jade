@@ -5,7 +5,7 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1')
     meta(name='apple-mobile-web-app-capable', content='yes')
     meta(name='apple-mobile-web-app-status-bar-style', content='black')
-    title weteli_tv
+    title MoVL with Vu:Talk
     link(rel='stylesheet', href='/css/jquery.mobile-1.2.0.min.css')
     link(rel='stylesheet', href='/css/my.css')
     link(rel='stylesheet', href='/css/tooltips.css')
@@ -18,10 +18,10 @@ html
     script(src='/socket.io/socket.io.js')
     script(src='/js/my.js')
     script
-        var timer;
+        var chat_timer, player_timer;
         show_chat = function(id, title) {
-            clearTimeout(timer);
-            timer = setTimeout(function(){$('#chat a').mouseout();}, 3000);
+            clearTimeout(chat_timer);
+            chat_timer = setTimeout(function(){$('#chat a').mouseout();}, 3000);
 
             $('#chat a').attr('title', id + ' says \"' + title + '\"')
             $('.tooltip').remove();
@@ -34,8 +34,10 @@ html
             if ($('#playlist li').length > 2){ $('#playlist a').eq(0).click(); }
         }
         
-        play_movie = function(id) {
+        play_movie = function(id, duration) {
+            clearTimeout(player_timer);
             $('#youtube-player-container').tubeplayer('play', id);
+            player_timer = setTimeout(function(){next_movie();}, duration * 1000);
         }
 
         swap_position = function(from, to) {
@@ -46,7 +48,7 @@ html
             src.slideDown();
         }
 
-        add_movie = function(id, title) {
+        add_movie = function(id, title, duration) {
             var html, newdiv;
             html = $('#playlist li:last').html();
             newdiv = $('<li data-theme="c" data-corners="false" data-shadow="false" data-iconshadow="true" data-iconsize="18" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" class="ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-btn-up-c">');
@@ -54,10 +56,10 @@ html
             newdiv.hide();
             $('#playlist li:last').before(newdiv);
             $('#playlist a').eq(-2).text(title);
-            $('#playlist a').eq(-2).click(function() { play_movie(id); });
+            $('#playlist a').eq(-2).click(function() { play_movie(id, duration); });
             newdiv.slideDown();
             if ($('#playlist li').length == 3){
-                play_movie(id);
+                play_movie(id, duration);
             }
         }
   body
