@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>weteli</title>
+  <link rel="stylesheet" href="site_media/css/jquery.mobile-1.2.0.min.css" />
+  <link rel="stylesheet" href="site_media/css/my.css" />
+  <script src="site_media/js/jquery.min.js"></script>
+  <script src="site_media/js/jquery.mobile-1.2.0.min.js"></script>
+  <script src="site_media/js/my.js"></script>
+  <script src="http://movl.lgr2s.com:3000/socket.io/socket.io.js"></script>
+
+  <!-- User-generated css -->
+  <style>
+    
+  </style>
+
+  <!-- User-generated js -->
+  <script>
+      var server = 'http://movl.lgr2s.com:3000';
+      //var server = 'http://192.168.0.2:3000';
+      var socket = io.connect(server);
+
+      socket.on('connect ack', function(data){
+          if (data.success) { $(location).attr('href','#page1');} 
+          else { alert(data.msg); }
+      });
+
+      get_duration = function(x) {
+          return Math.floor(x/60) + ':' + ('0'+ x%60).substr(-2)
+      }
+      
+      connect_to_server = function() {
+          if ($('#nickname').val() === ""){
+            alert("please enter your nickname");
+            $('#nickname').focus();
+          }
+          else if ($('#code').val() === ""){
+            alert("please enter the TV code");
+            $('#code').focus();
+          }
+          else {
+            socket.emit('mobile connect', {'nickname':$('#nickname').val(), 'code':$('#code').val()});
+          }
+      }
+
+      send_message = function() {
+        socket.emit('mobile chat', {'nickname':$('#nickname').val(), 'msg':$('#messagebox').val()});
+      }
+
+      add_playlist = function(id, title, duration) {
+          $.getJSON(server + '/playlist/add/' + id + '?callback=?', null, function(data){
+              alert('Video added');
+              socket.emit('playlist add', {'id':id, 'title':title, 'duration':duration});
+          });
+      }
+
+      update_detailed_info = function(id, thumb, desc, like, dislike) {
+          html = '<img src="' + thumb + '">';
+          $('#detailed_image img').remove();
+          $('#detailed_image').append(html);
+          $('#detailed_desc').html(desc);
+          $('#like p').html(like);
+          $('#dislike p').html(dislike);
+
+          $('#like img').off('click');
+          $('#dislike img').off('click');
+
+          $('#like img').click(function(){ 
+              cur_vote = $('#like p').html() * 1
+              $('#like p').html(cur_vote + 1);
+              $.getJSON(server + '/playlist/like/' + id + '?callback=?', null, null); 
+          });
+          $('#dislike img').click(function(){ 
+              cur_vote = $('#dislike p').html() * 1
+              $('#dislike p').html(cur_vote + 1);
+              $.getJSON(server + '/playlist/dislike/' + id + '?callback=?', null, null); 
+          });
+      }
+
+      get_peoples = function() {
+          $('#peoples li').slice(1,-1).remove();
+          $.getJSON(server + '/user/list?callback=?', null, function(data){
+              for(var i=0; i < data.length; i++){
+                  var html, newdiv;
+                  html = $('#peoples li:last').html();
+                  newdiv = $('<li data-theme="d" data-corners="false" data-shadow="false" data-iconshadow="true" data-iconsize="18" data-wrapperels="div" data-icon="arrow-r" dat    a-iconpos="right" class="ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-btn-up-c">');
+                  newdiv.html(html);
+                  newdiv.hide();
+                  $('#peoples li:last').before(newdiv);
+                  $('#peoples a').eq(-2).text(data[i]);
+                  newdiv.slideDown();
+              }
+          });
+      }
+
+      get_feeds = function(feed) {
+          $('#feeds ul li').remove();
+          $.getJSON(server + '/feed/' + feed + '?callback=?', null, function(data){
+              $.each(data, function(index, entry){
+                  html ='<li class="ui-li ui-li-static ui-btn-up-c ui-li-has-thumb " data-theme="c"> \
+                           <a href="javascript:add_playlist(\''+entry.id+'\', \''+entry.title+'\','+entry.duration+');" class="ui-link-inherit"> \
+                            <img src='+entry.thumbnail+' alt="Thumbnail" class="ui-li-thumb"> \
+                            <h3 class="ui-li-heading">'+entry.title+'</h3> \
+                            <h5 class="ui-li-heading">'+get_duration(entry.duration)+'</h5> \
+                        </li>';
+                  $('#feeds ul').append(html);
+              });
+          });
+      }
+
+      get_vote_candidates = function() {
+          $('#vote_candidates ul li').remove();
+          $.getJSON(server + '/playlist/get?callback=?', null, function(data){
+              if (data.length) {
+                $.each(data, function(index, entry){
+                    html ='<li class="ui-li ui-li-static ui-btn-up-c ui-li-has-thumb " data-theme="c"> \
+                             <a href="#page5" onClick="javascript:update_detailed_info(\''+entry.id+'\',\''+entry.thumbnail+'\',\''+entry.description+'\','+entry.like+','+entry.dislike+');" class="ui-link-inherit"> \
+                              <img src='+entry.thumbnail+' alt="Thumbnail" class="ui-li-thumb"> \
+                              <h3 class="ui-li-heading">'+entry.title+'</h3> \
+                              <h5 class="ui-li-heading">'+get_duration(entry.duration)+'</h5> \
+                          </li>';
+                     $('#vote_candidates ul').append(html);
+                });
+             } else {
+               html ='<li class="ui-li ui-li-static ui-btn-up-c" data-theme="c"> \
+                        <a href="#page1" class="ui-link-inherit"> \
+                         <h3 class="ui-li-heading" style="text-align:center"> Add your video now! </h3> \
+                     </li>';
+               $('#vote_candidates ul').append(html);
+             }
+          });
+      }
+  </script>
+</head>
+<body>
+  <!-- intro -->
+  <div data-role="page" id="page8">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Video Jukebox
+          </h3>
+      </div>
+      <div data-role="content">
+          <div data-role="fieldcontain">
+              <fieldset data-role="controlgroup">
+                  <label for="textinput1">
+                      Nickname
+                  </label>
+                  <input id="nickname" placeholder="What are you called?" value="" type="text">
+              </fieldset>
+          </div>
+          <div data-role="fieldcontain">
+              <fieldset data-role="controlgroup">
+                  <label for="textinput2">
+                      Code
+                  </label>
+                  <input id="code" placeholder="Enter the code bottom of the TV" value="" maxlength="4" type="text">
+              </fieldset>
+          </div>
+          <input onClick="javascript:connect_to_server();" type="button" data-theme="b" data-icon="refresh" data-iconpos="left" value="Submit">
+      </div>
+      <div data-theme="a" data-role="footer" data-position="fixed">
+          <h3>
+              Powered by Vu:Talk
+          </h3>
+      </div>
+  </div>
+  <!-- Add -->
+  <div data-role="page" id="page1">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Add New Video
+          </h3>
+      </div>
+      <div data-role="content" id="category">
+          <ul data-role="listview" data-divider-theme="a" data-inset="true">
+              <li data-role="list-divider" role="heading">
+                  Video Categories
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('top_rated');" data-transition="slide">
+                      Top rated
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('top_favorites');" data-transition="slide">
+                      Top favorites
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('most_shared');" data-transition="slide">
+                      Most shared
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('most_popular');" data-transition="slide">
+                      Most popular
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('most_recent');" data-transition="slide">
+                      Most recent
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('most_discussed');" data-transition="slide">
+                      Most discussed
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('most_featured');" data-transition="slide">
+                      Recently featured
+                  </a>
+              </li>
+              <li data-theme="c">
+                  <a href="#page9" onClick="get_feeds('most_viewed');" data-transition="slide">
+                      Most viewed
+                  </a>
+              </li>
+          </ul>
+      </div>
+      <div data-role="tabbar" data-iconpos="top" data-theme="a">
+          <ul>
+              <li>
+                  <a href="#page1" data-transition="none" data-theme="" data-icon="plus">
+                      Add
+                  </a>
+              </li>
+              <li>
+                  <a href="#page4" onClick="get_vote_candidates();" data-transition="none" data-theme="" data-icon="star">
+                      Vote
+                  </a>
+              </li>
+              <li>
+                  <a href="#page6" onClick="get_peoples();" data-transition="none" data-theme="" data-icon="search">
+                      People
+                  </a>
+              </li>
+              <li>
+                  <a href="#page7" data-transition="none" data-theme="" data-icon="forward">
+                      Chat
+                  </a>
+              </li>
+          </ul>
+      </div>
+  </div>
+  <!-- Add.detail -->
+  <div data-role="page" id="page9">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Add New Video
+          </h3>
+      </div>
+      <div data-role="content" id="feeds">
+          <ul data-role="listview" data-divider-theme="a" data-inset="false">
+          </ul>
+      </div>
+      <div data-role="tabbar" data-iconpos="top" data-theme="a">
+          <ul>
+              <li>
+                  <a href="#page1" data-transition="none" data-theme="" data-icon="plus">
+                      Add
+                  </a>
+              </li>
+              <li>
+                  <a href="#page4" onClick="get_vote_candidates();" data-transition="none" data-theme="" data-icon="star">
+                      Vote
+                  </a>
+              </li>
+              <li>
+                  <a href="#page6" onClick="get_peoples();" data-transition="none" data-theme="" data-icon="search">
+                      People
+                  </a>
+              </li>
+              <li>
+                  <a href="#page7" data-transition="none" data-theme="" data-icon="forward">
+                      Chat
+                  </a>
+              </li>
+          </ul>
+      </div>
+  </div>
+  <!-- Vote -->
+  <div data-role="page" id="page4">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Vote
+          </h3>
+      </div>
+      <div data-role="content" id="vote_candidates">
+          <ul data-role="listview" data-divider-theme="a" data-inset="false">
+          </ul>
+      </div>
+      <div data-role="tabbar" data-iconpos="top" data-theme="a">
+          <ul>
+              <li>
+                  <a href="#page1" data-transition="none" data-theme="" data-icon="plus">
+                      Add
+                  </a>
+              </li>
+              <li>
+                  <a href="#page4" onClick="get_vote_candidates();" data-transition="none" data-theme="" data-icon="star">
+                      Vote
+                  </a>
+              </li>
+              <li>
+                  <a href="#page6" onClick="get_peoples();" data-transition="none" data-theme="" data-icon="search">
+                      People
+                  </a>
+              </li>
+              <li>
+                  <a href="#page7" data-transition="none" data-theme="" data-icon="forward">
+                      Chat
+                  </a>
+              </li>
+          </ul>
+      </div>
+  </div>
+  <!-- Vote.detail -->
+  <div data-role="page" id="page5">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Vote
+          </h3>
+      </div>
+      <div data-role="content">
+          <div style=" text-align:center" id="detailed_image">
+          </div>
+          <div data-role="collapsible-set">
+              <div data-role="collapsible" data-collapsed="false">
+                  <h3>
+                      Description
+                  </h3>
+                  <div>
+                      <p id="detailed_desc">
+                      </p>
+                  </div>
+              </div>
+          </div>
+          <div class="ui-grid-a">
+              <div class="ui-block-a">
+                  <div style=" text-align:center" id="like">
+                      <img style="width: 70px; height: 70px" src="http://assets.codiqa.com/j4gQ9ZgLRky82HXzXdBH_117064-matte-blue-and-white-square-icon-business-thumbs-up.png">
+                      <p></p>
+                  </div>
+              </div>
+              <div class="ui-block-b">
+                  <div style=" text-align:center" id="dislike">
+                      <img style="width: 70px; height: 70px" src="http://assets.codiqa.com/zkuliglrS0m2CWLnOWQS_117062-matte-blue-and-white-square-icon-business-thumbs-down1.png">
+                      <p></p>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div data-role="tabbar" data-iconpos="top" data-theme="a">
+          <ul>
+              <li>
+                  <a href="#page1" data-transition="none" data-theme="" data-icon="plus">
+                      Add
+                  </a>
+              </li>
+              <li>
+                  <a href="#page4" onClick="get_vote_candidates();" data-transition="none" data-theme="" data-icon="star">
+                      Vote
+                  </a>
+              </li>
+              <li>
+                  <a href="#page6" onClick="get_peoples();" data-transition="none" data-theme="" data-icon="search">
+                      People
+                  </a>
+              </li>
+              <li>
+                  <a href="#page7" data-transition="none" data-theme="" data-icon="forward">
+                      Chat
+                  </a>
+              </li>
+          </ul>
+      </div>
+  </div>
+  <!-- People -->
+  <div data-role="page" id="page6">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Peoples
+          </h3>
+      </div>
+      <div data-role="content" id="peoples">
+          <ul data-role="listview" data-divider-theme="d" data-inset="false">
+              <li data-role="list-divider" role="heading">
+                  Near By
+              </li>
+              <li data-theme="d" style="display:none">
+                  <a href="#page1" data-transition="fade">
+                      Yourself
+                  </a>
+              </li>
+          </ul>
+      </div>
+      <div data-role="tabbar" data-iconpos="top" data-theme="a">
+          <ul>
+              <li>
+                  <a href="#page1" data-transition="none" data-theme="" data-icon="plus">
+                      Add
+                  </a>
+              </li>
+              <li>
+                  <a href="#page4" onClick="get_vote_candidates();" data-transition="none" data-theme="" data-icon="star">
+                      Vote
+                  </a>
+              </li>
+              <li>
+                  <a href="#page6" onClick="get_peoples();" data-transition="none" data-theme="" data-icon="search">
+                      People
+                  </a>
+              </li>
+              <li>
+                  <a href="#page7" data-transition="none" data-theme="" data-icon="forward">
+                      Chat
+                  </a>
+              </li>
+          </ul>
+      </div>
+  </div>
+  <!-- Chat -->
+  <div data-role="page" id="page7">
+      <div data-theme="a" data-role="header">
+          <h3>
+              Chat
+          </h3>
+      </div>
+      <div data-role="content">
+          <div style=" text-align:center">
+              <img style="width: 200px; height: 150px" src="http://assets.codiqa.com/lsgTlHwPTcuuHW2dGKbN_chat-icon.jpg">
+          </div>
+          <div data-role="fieldcontain">
+              <fieldset data-role="controlgroup">
+                  <label for="textarea1">
+                      Message
+                  </label>
+                  <textarea id="messagebox" placeholder="Send a message here..."
+                  data-mini="true"></textarea>
+              </fieldset>
+          </div>
+          <input onClick="javascript:send_message();" type="button" data-theme="b" data-icon="info" data-iconpos="left" value="Send">
+      </div>
+      <div data-role="tabbar" data-iconpos="top" data-theme="a">
+          <ul>
+              <li>
+                  <a href="#page1" data-transition="none" data-theme="" data-icon="plus">
+                      Add
+                  </a>
+              </li>
+              <li>
+                  <a href="#page4" onClick="get_vote_candidates();" data-transition="none" data-theme="" data-icon="star">
+                      Vote
+                  </a>
+              </li>
+              <li>
+                  <a href="#page6" onClick="get_peoples();" data-transition="none" data-theme="" data-icon="search">
+                      People
+                  </a>
+              </li>
+              <li>
+                  <a href="#page7" data-transition="none" data-theme="" data-icon="forward">
+                      Chat
+                  </a>
+              </li>
+          </ul>
+      </div>
+  </div>
+
+  
+</body>
+</html>
