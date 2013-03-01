@@ -51,11 +51,12 @@ html
         add_movie = function(id, title, duration) {
             var html, newdiv;
             html = $('#playlist li:last').html();
-            newdiv = $('<li data-theme="c" data-corners="false" data-shadow="false" data-iconshadow="true" data-iconsize="18" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" class="ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-btn-up-c">');
+            newdiv = $('<li data-theme="c" data-corners="false" data-shadow="false" data-iconshadow="true" data-iconsize="18" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" class="ui-btn ui-btn-icon-right ui-li-has-arrow ui-li ui-li-has-count ui-btn-up-c">');
             newdiv.html(html);
             newdiv.hide();
             $('#playlist li:last').before(newdiv);
             $('#playlist a').eq(-2).text(title);
+            $('#playlist a').eq(-2).append($('<span class="ui-li-count ui-btn-up-c ui-btn-corner-all">').html(0));
             $('#playlist a').eq(-2).click(function() { play_movie(id, duration); });
             newdiv.slideDown();
             if ($('#playlist li').length == 3){
