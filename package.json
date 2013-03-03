@@ -12,7 +12,8 @@
         "coffee-script": "1.4.0",
         "request": "2.14.0",
         "socket.io": "0.9.13",
-        "xml2js":"0.2.4"
+        "xml2js":"0.2.4",
+        "nodemon":"0.6.23",
     },
     "engines" : {
         "node": "0.8.x",
