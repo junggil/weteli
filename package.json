@@ -1,0 +1,21 @@
+{
+    "name": "weteli",
+    "description": "Video Jukebox with Vu:Talk platform",
+    "version": "0.0.1",
+    "author":{
+        "name": "TeamV",
+        "email": "team-v@lge.com"
+    },
+    "dependencies" : {
+        "express": "2.5.8",
+        "jade": "0.28.1",
+        "coffee-script": "1.4.0",
+        "request": "2.14.0",
+        "socket.io": "0.9.13",
+        "xml2js":"0.2.4"
+    },
+    "engines" : {
+        "node": "*",
+        "npm" : "*"
+    }
+}
