@@ -1,1 +1,1 @@
-web: sudo coffee app.coffee
+web: coffee app.coffee
