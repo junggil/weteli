@@ -20,8 +20,9 @@
 
   <!-- User-generated js -->
   <script>
-      var server = 'http://weteli.herokuapp.com';
-      var socket = io.connect(server + ':80');
+      var server = 'http://weteli.herokuapp.com:80';
+      //var server = 'http://192.168.0.2:5000';
+      var socket = io.connect(server);
 
       socket.on('connect ack', function(data){
           if (data.success) { $(location).attr('href','#page1');} 

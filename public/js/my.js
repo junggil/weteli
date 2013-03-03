@@ -287,12 +287,15 @@ $(function(){
         onPlayerEnded: function(){}
     });
 
-    var socket = io.connect('http://movl.lgr2s.com');
+    var socket = io.connect(window.location.hostname);
     socket.on('playlist add', function(data) {
         add_movie(data.id, data.title, data.duration);
     });
     socket.on('playlist position', function(data) {
         swap_position(data.from, data.to);
+    });
+    socket.on('playlist score', function(data) {
+        $('#playlist span').eq(data.pos).html(data.score);
     });
     socket.on('chat message', function(data){
         show_chat(data.nickname, data.msg);
@@ -313,6 +316,8 @@ $(function(){
             time: 3000
         });
     });
+
+    $('#playlist span').remove();
 });
     
 })(jQuery);

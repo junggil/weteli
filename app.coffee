@@ -65,6 +65,7 @@ io.sockets.on 'connection', (socket) =>
 #Routes
 app.get '/', (req, res) =>
     global.tv_code = get_random_code()
+    global.playlist = []
     res.render('list', {
         title: 'Connected TV',
         code: tv_code
@@ -94,6 +95,7 @@ app.get '/playlist/like/:id', (req, res) =>
     playlist[before].like += 1
     playlist.sort((item1, item2) -> (item2.like - item2.dislike) - (item1.like - item1.dislike))
     after = get_index req.params.id, playlist
+    io.sockets.emit 'playlist score', {pos:before, score:playlist[after].like - playlist[after].dislike}
     if before != after
         io.sockets.emit 'playlist position', {from:before+1, to:after+1}
     res.json []
@@ -103,6 +105,7 @@ app.get '/playlist/dislike/:id', (req, res) =>
     playlist[before].dislike += 1
     playlist.sort((item1, item2) -> (item2.like - item2.dislike) - (item1.like - item1.dislike))
     after = get_index req.params.id, playlist
+    io.sockets.emit 'playlist score', {pos:before, score:playlist[after].like - playlist[after].dislike}
     if before != after
         io.sockets.emit 'playlist position', {from:before+1, to:after+1}
     res.json []
