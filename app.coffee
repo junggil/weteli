@@ -3,7 +3,12 @@ request = require 'request'
 xml2js = require 'xml2js'
 socketio = require 'socket.io'
 app = express.createServer()
+
 io = socketio.listen(app)
+io.configure () =>
+    io.set "transports", ["xhr-polling"]
+    io.set "polling duration", 10
+
 
 app.configure =>
   app.set 'views', __dirname + '/views'
