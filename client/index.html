@@ -11,7 +11,7 @@
   <script src="site_media/js/jquery.min.js"></script>
   <script src="site_media/js/jquery.mobile-1.2.0.min.js"></script>
   <script src="site_media/js/my.js"></script>
-  <script src="http://movl.lgr2s.com/socket.io/socket.io.js"></script>
+  <script src="http://weteli.herokuapp.com/socket.io/socket.io.js"></script>
 
   <!-- User-generated css -->
   <style>
@@ -20,8 +20,8 @@
 
   <!-- User-generated js -->
   <script>
-      var server = 'http://movl.lgr2s.com';
-      var socket = io.connect(server);
+      var server = 'http://weteli.herokuapp.com';
+      var socket = io.connect(server + ':80');
 
       socket.on('connect ack', function(data){
           if (data.success) { $(location).attr('href','#page1');} 
