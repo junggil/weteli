@@ -9,7 +9,6 @@ io.configure () =>
     io.set "transports", ["xhr-polling"]
     io.set "polling duration", 10
 
-
 app.configure =>
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
@@ -66,6 +65,7 @@ io.sockets.on 'connection', (socket) =>
 app.get '/', (req, res) =>
     global.tv_code = get_random_code()
     global.playlist = []
+    global.devices = {}
     res.render('list', {
         title: 'Connected TV',
         code: tv_code
