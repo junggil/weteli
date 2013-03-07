@@ -1,0 +1,22 @@
+<?xml version   ="1.0" encoding="UTF-8" ?>
+<widget xmlns   = "http://www.w3.org/ns/widgets"
+    xmlns:gap   = "http://phonegap.com/ns/1.0"
+    id          = "com.lge.weteli"
+    versioncode = "1"
+    version     = "1.0.0">
+    
+    <name>WeTeli</name>
+    
+    <content src="index.html"/>
+    <icon src="icon.png" width="256" height="256" />
+    
+    <description>
+        Video jukebox 
+    </description>
+    
+    <preference name="phonegap-version" value="2.0.0" />
+
+    <!-- for Android -->
+    <preference name="orientation" value="portrait" />
+    <preference name="android-minSdkVersion" value="9" />
+</widget>
